@@ -8,22 +8,38 @@ type ChannelOptions = {
   onJoin?: (event: any) => void;
 }
 
+
+
 /**
  *
  * @param channelName
- * @param props
+ * @param params_or_callback
+ * @param callback
  */
-export function useChannel(channelName: string, props?: Partial<ChannelOptions>) {
+export function useChannel(channelName: string, params_or_callback?: any, callback?: any) {
   const phoenixSocket = useSocket()
 
-  const [channel] = useState(() => {
-    const channel: any =
-      phoenixSocket.socket.channel(channelName, props)
+  let joinCallback = callback
+  let params = {}
 
-    channel.join()
+  if (typeof params_or_callback === "function") {
+    joinCallback = params_or_callback
+  } else {
+    params = params_or_callback
+  }
 
-    return channel
-  })
+  const [channel] =
+    useState(() => {
+      const channel: any =
+        phoenixSocket.socket.channel(channelName, params, phoenixSocket.socket)
+
+      channel.join()
+        .receive("ok", () => {
+          joinCallback()
+        })
+
+      return channel
+    })
 
   // OnError
   // OnClose
