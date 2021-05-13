@@ -7,6 +7,9 @@ type SocketOptions = {
   onLeave?: (event: any) => void;
 }
 
+/**
+ *
+ */
 export function useSocket() {
   const {socket, readyState} = useContext(PhoenixContext)
 

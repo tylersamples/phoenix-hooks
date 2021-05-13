@@ -8,6 +8,11 @@ type ChannelOptions = {
   onJoin?: (event: any) => void;
 }
 
+/**
+ *
+ * @param channelName
+ * @param props
+ */
 export function useChannel(channelName: string, props?: Partial<ChannelOptions>) {
   const phoenixSocket = useSocket()
 
@@ -30,9 +35,17 @@ export function useChannel(channelName: string, props?: Partial<ChannelOptions>)
     useCallback((event, payload, timeout) =>
       channel.push(event, payload, timeout ? timeout : channel.timeout), [channel, channel.push])
 
+  const leaveCallback = useCallback(timeout => {
+    return channel
+      .leave(timeout ? channel : channel.timeout)
+      .receive("ok", () => null)
+  }, [channel, channel.on])
+
   return {
     ...phoenixSocket,
+    channel,
     handleEvent: handleEventCallback,
-    pushEvent: pushEventCallback
+    pushEvent: pushEventCallback,
+    leave: leaveCallback
   }
 }

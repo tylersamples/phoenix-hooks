@@ -12,6 +12,11 @@ type ProviderProps = {
   opts?: Partial<SocketConnectOption>
 }
 
+/**
+ *
+ * @param props
+ * @constructor
+ */
 export const PhoenixSocketProvider = (props: ProviderProps) => {
   if (!props.url)
     throw new Error("No url provided")
@@ -20,8 +25,6 @@ export const PhoenixSocketProvider = (props: ProviderProps) => {
 
   const readyState = useCallback(() => socket.connectionState(), [socket])
   socket.connect()
-
-  console.log(socket.connectionState())
 
   return (
     <PhoenixContext.Provider value={{socket, readyState}}>
