@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, {useState, useMemo, useCallback} from 'react'
 import {Socket, SocketConnectOption} from 'phoenix'
 
 export const PhoenixContext = React.createContext({
@@ -17,8 +17,8 @@ export const PhoenixSocketProvider = (props: ProviderProps) => {
     throw new Error("No url provided")
 
   const [socket] = useState(new Socket(props.url, props.opts))
-  // @ts-ignore
-  const readyState = useMemo(() => socket.connectionState(), [socket.conn, socket.conn.readyState])
+
+  const readyState = useCallback(() => socket.connectionState(), [socket])
   socket.connect()
 
   console.log(socket.connectionState())

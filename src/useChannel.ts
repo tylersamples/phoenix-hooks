@@ -1,6 +1,5 @@
-import React, {useState} from 'react'
-
-import {useSocket} from './index'
+import { useState, useCallback } from 'react'
+import { useSocket } from './index'
 
 type ChannelOptions = {
   onClose?: (event: any) => void;
@@ -9,16 +8,31 @@ type ChannelOptions = {
   onJoin?: (event: any) => void;
 }
 
-export function useChannel(channelName: string, props: any) {
-  const [readyState, setReadyState] = useState({})
+export function useChannel(channelName: string, props?: Partial<ChannelOptions>) {
+  const phoenixSocket = useSocket()
 
+  const [channel] = useState(() => {
+    const channel: any =
+      phoenixSocket.socket.channel(channelName, props)
 
-  const {socket} = useSocket()
+    channel.join()
+
+    return channel
+  })
 
   // OnError
   // OnClose
 
+  const handleEventCallback = useCallback((event, callback) =>
+    channel.on(event, callback),[channel, channel.on])
 
+  const pushEventCallback =
+    useCallback((event, payload, timeout) =>
+      channel.push(event, payload, timeout ? timeout : channel.timeout), [channel, channel.push])
 
-  const channel: any = socket.channel(channelName, props)
+  return {
+    ...phoenixSocket,
+    handleEvent: handleEventCallback,
+    pushEvent: pushEventCallback
+  }
 }

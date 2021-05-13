@@ -4,7 +4,6 @@
   "description": "",
   "main": "src/index.tsx",
   "scripts": {
-    "pack": "@pika/pack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -32,7 +31,6 @@
     "react": "^17.0.2"
   },
   "devDependencies": {
-    "@pika/pack": "^0.5.0",
     "@pika/plugin-build-types": "^0.9.2",
     "@pika/plugin-build-web": "^0.9.2",
     "@pika/plugin-standard-pkg": "^0.9.2",
