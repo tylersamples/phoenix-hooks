@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useCallback} from 'react'
+import React, {useState, useCallback} from 'react'
 import {Socket, SocketConnectOption} from 'phoenix'
 
 export const PhoenixContext = React.createContext({
