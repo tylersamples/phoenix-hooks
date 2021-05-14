@@ -1,9 +1,11 @@
-export enum ReadyState {
-  UNINSTANTIATED = -1,
-  CONNECTING = 0,
-  OPEN = 1,
-  CLOSING = 2,
-  CLOSED = 3,
+import {usePhoenixSocket} from './useSocket'
+
+export enum SocketStates {
+  UNINSTANTIATED,
+  CONNECTING ,
+  OPEN,
+  CLOSING ,
+  CLOSED ,
 }
 
 export enum ChannelStates {
@@ -16,6 +18,6 @@ export enum ChannelStates {
 
 export { PhoenixSocketProvider } from './PhoenixSocketProvider'
 
-export { useSocket } from './useSocket'
+export { useSocket, usePhoenixSocket } from './useSocket'
 export { useChannel } from './useChannel'
 export { usePresence } from './usePresence'

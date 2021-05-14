@@ -14,10 +14,10 @@ export function usePresence(channelOrChannelName: Channel | string, opts?: any) 
   if (typeof channelOrChannelName == 'string') {
     let {channel} = useChannel(channelOrChannelName)
   } else {
-    channel = channelOrChannelName
+    channel = channelOrChannelName as Channel
   }
 
-  const [presence] = useState(new Presence(channelOrChannelName))
+  const [presence] = useState(new Presence(channel))
 
   const listCallback = useCallback(cb => presence.list(cb), [channel, presence])
   const onJoinCallback = useCallback(cb => presence.onJoin(cb), [channel, presence])
@@ -25,8 +25,8 @@ export function usePresence(channelOrChannelName: Channel | string, opts?: any) 
 
   return {
     ...channel,
-    list: listCallback,
-    handleJoin: onJoinCallback,
-    handleLeave: onLeaveCallback
+    listPresence: listCallback,
+    handlePresenceJoin: onJoinCallback,
+    handlePresenceLeave: onLeaveCallback
   }
 }

@@ -5,7 +5,7 @@ import { Channel } from 'phoenix'
 
 type ChannelOptions = {
   onClose?: () => void;
-  onError?: () => void;
+  onError?: (err: any) => void;
   onLeave?: () => void;
   onJoin?: (object) => void;
   onTimeout?: () => void;
@@ -31,9 +31,9 @@ export function useChannel(channelName: string, params: Partial<ChannelOptions> 
     setChannelState(ChannelStates.CLOSED)
   })
 
-  const onErrorCallback = useCallback(() => {
+  const onErrorCallback = useCallback(err => {
     if (typeof onError === 'function')
-      onError()
+      onError(err)
 
     setChannelState(ChannelStates.ERRORED)
   })
