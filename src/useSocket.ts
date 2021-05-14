@@ -43,7 +43,6 @@ export function usePhoenixSocket(url?: string, opts?: Partial<SocketOpts>) {
         onError(err)
     }, [onError])
 
-
   let [socket] = useState(() => {
     const socket = new Socket(url, opts)
 
@@ -65,7 +64,6 @@ export function usePhoenixSocket(url?: string, opts?: Partial<SocketOpts>) {
       setSocketState(SocketStates.CLOSING)
     })
     setSocketState(SocketStates.CONNECTING)
-
 
     socket.connect()
     return socket
