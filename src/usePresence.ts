@@ -1,22 +1,12 @@
 import {useState, useCallback, useEffect, useMemo} from 'react'
 import { Channel, Presence } from 'phoenix'
 
-import { useChannel } from './index'
-
 /**
  *
- * @param channelOrChannelName
+ * @param channel
  * @param opts
  */
-export function usePresence(channelOrChannelName: Channel | string, opts?: any) {
-  let channel = null
-
-  if (typeof channelOrChannelName == 'string') {
-    let {channel, setChannel} = useChannel(channelOrChannelName)
-  } else {
-    channel = channelOrChannelName as Channel
-  }
-
+export function usePresence(channel: Channel, opts?: any) {
   const [sync, setSync] = useState([])
 
   const presence = useMemo(() => new Presence(channel), [channel]);
@@ -60,7 +50,6 @@ export function usePresence(channelOrChannelName: Channel | string, opts?: any) 
     )
 
   return {
-    ...channel,
     presence: presence,
     listPresence: listCallback,
     handlePresenceJoin: onJoinCallback,
