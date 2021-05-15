@@ -4,29 +4,12 @@ Phoenix Sockets, Channels, and Presence with React hooks.
 
 ## Getting Started
 
-
 Installation:
 ```bash
 $ npm install phoenix-hooks
 ```
 
-### Provider
-
-```typescript jsx
-import { PhoenixSocketProvider } from 'phoenix-hooks'
-
-function App() {
-  return (
-    <PhoenixSocketProvider url={`//localhost:4000/socket`}>
-      {/* Your component */}
-    </PhoenixSocketProvider>
-  )
-}
-
-```
-
 ### Phoenix Socket
-
 
 ```typescript
 import { useSocket } from 'phoenix-hooks'
@@ -119,6 +102,26 @@ const { handleChannelEvent, pushChannelEvent } =
   }})
 ```
 
+#### `useChannels`
+Connect to a given Phoenix channel.
+
+#### Arguments
+* `channelName`: `string`
+* `opts`: `ChannelOptions`
+
+```typescript
+type ChannelOptions = {
+  onClose?: () => void; 
+  onError?: (err: any) => void;
+  onLeave?: () => void;
+  onJoin?: (object) => void; // Useful for getting join/3 response 
+  onTimeout?: () => void;
+  socket: Socket;
+  params: object;
+}
+```
+
+
 #### `channelState`
 ```typescript
 enum ChannelStates {
@@ -163,8 +166,13 @@ import { useSocket, useChannels, usePresence } from 'phoenix-hooks'
 const { socket } = useSocket(`//localhost:4000/socket`) // Optional, see Provider
 const { channel } = useChannels(`chat:${123}`, {socket: socket})
 const { handlePresenceSync } = usePresence(channel)
-
 ```
+
+#### `usePresence`
+Use Phoenix Presence for a given channel.
+
+#### Arguments
+* `channel`: `Channel` Channel from a previous `useChannels` call
 
 #### `presence`
 The underlying Phoenix Presence class.
@@ -194,7 +202,47 @@ Handle callback upon `presence_diff` join
 
 Handle callback upon `presence_diff` leave
 
+### Provider
 
+```typescript jsx
+import { PhoenixSocketProvider } from 'phoenix-hooks'
+
+function App() {
+  return (
+    <PhoenixSocketProvider url={`//localhost:4000/socket`}>
+      {/* Your component */}
+    </PhoenixSocketProvider>
+  )
+}
+```
+
+#### Attributes
+* `url`: `string`
+  * `wss://localhost:4000/socket`
+  * `ws://localhost:4000/socket`
+  * `localhost:4000/socket`
+  * `/socket`
+* `opts`: `SocketOptions`
+
+```typescript
+type SocketOptions = {
+  binaryType: BinaryType;
+  params: object | (() => object);
+  transport: string;
+  timeout: number;
+  heartbeatIntervalMs: number;
+  longpollerTimeout: number;
+  encode: (payload: object, callback: (encoded: any) => void) => void;
+  decode: (payload: string, callback: (decoded: any) => void) => void;
+  logger: (kind: string, message: string, data: any) => void;
+  reconnectAfterMs: (tries: number) => number;
+  rejoinAfterMs: (tries: number) => number;
+  vsn: string;
+  onOpen: () => void;
+  onClose: () => void;
+  onError: (any) => void;
+}
+```
 ## License
 
 [MIT](./LICENSE)

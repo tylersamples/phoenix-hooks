@@ -15,6 +15,7 @@ type ProviderProps = {
 }
 
 /**
+ * Phoenix Socket context provider.
  *
  * @param props
  * @constructor
