@@ -1,5 +1,5 @@
 export enum SocketStates {
-  UNINSTANTIATED,
+  UNINSTANTIATED = -1,
   CONNECTING ,
   OPEN,
   CLOSING ,
