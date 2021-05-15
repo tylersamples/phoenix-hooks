@@ -10,7 +10,10 @@ type SocketOpts = SocketConnectOption & {
 }
 
 /**
+ * Instantiate and connect using Phoenix sockets or use PhoenixSocketProviders socket.
  *
+ * @param url
+ * @param opts
  */
 export function useSocket(url?: string, opts?: Partial<SocketOpts>) {
   if (typeof url !== 'undefined') {
@@ -66,10 +69,31 @@ export function usePhoenixSocket(url?: string, opts?: Partial<SocketOpts>) {
     setSocketState(SocketStates.CONNECTING)
 
     socketRef.current.connect()
-  })
+  }, [socketRef])
+
+  const socketConnectCallback =
+    useCallback(() =>
+      socketRef.current.connect(),
+      [socketRef],
+    )
+
+  const socketDisconnectCallback =
+    useCallback((callback?, code?, reason?) =>
+      socketRef.current.disconnect(callback, code, reason),
+      [socketRef],
+    )
+
+  const socketOnMessageCallback =
+    useCallback(callback =>
+      socketRef.current.onMessage(callback),
+      [socketRef],
+    )
 
   return {
+    socketState,
     socket: socketRef.current,
-    socketState
+    socketConnect: socketConnectCallback,
+    socketDisconnect: socketDisconnectCallback,
+    socketHandleMessage: socketOnMessageCallback
   }
 }
