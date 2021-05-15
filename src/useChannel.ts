@@ -9,7 +9,8 @@ type ChannelOptions = {
   onLeave?: () => void;
   onJoin?: (object) => void;
   onTimeout?: () => void;
-  socket: Socket
+  socket: Socket;
+  params: object;
 }
 
 /**
@@ -18,14 +19,18 @@ type ChannelOptions = {
  * @param params
  */
 export function useChannel(channelName: string, params: Partial<ChannelOptions> = {}) {
-  const { socket } = params
+  let { socket, ...opts } = params
 
-  const phoenixSocket = socket || useSocket()
+  if (socket === undefined) {
+    const phoenixSocket = useSocket()
 
-  if (phoenixSocket.socket === undefined)
+    socket = phoenixSocket.socket
+  }
+
+  if (socket === undefined)
     throw new Error('Socket is undefined. Is component within a provider or has a socket been passed?')
 
-  const { onJoin, onError, onTimeout, onLeave, onClose } = params
+  const { onJoin, onError, onTimeout, onLeave, onClose } = opts
 
   const [channelState, setChannelState] = useState(ChannelStates.CLOSED)
 
@@ -43,7 +48,7 @@ export function useChannel(channelName: string, params: Partial<ChannelOptions> 
     setChannelState(ChannelStates.ERRORED)
   })
 
-  const channelRef = useRef(phoenixSocket.socket.channel(channelName, params, phoenixSocket.socket))
+  const channelRef = useRef(socket.channel(channelName, opts))
 
   useEffect(() => {
     setChannelState(ChannelStates.JOINING)
@@ -101,7 +106,6 @@ export function useChannel(channelName: string, params: Partial<ChannelOptions> 
     )
 
   return {
-    ...phoenixSocket,
     channel: channelRef.current,
     channelState,
     handleChannelEvent: handleEventCallback,
