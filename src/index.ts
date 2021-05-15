@@ -1,18 +1,4 @@
-export enum SocketStates {
-  UNINSTANTIATED = -1,
-  CONNECTING,
-  OPEN,
-  CLOSING,
-  CLOSED,
-}
-
-export enum ChannelStates {
-  CLOSED,
-  ERRORED,
-  JOINED,
-  JOINING,
-  LEAVING
-}
+export {SocketStates, ChannelStates} from './types'
 
 export { PhoenixSocketProvider } from './PhoenixSocketProvider'
 

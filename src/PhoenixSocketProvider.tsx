@@ -1,12 +1,8 @@
 import React from 'react'
 import { SocketConnectOption } from 'phoenix'
 
+import { PhoenixContext } from './types'
 import { useSocket } from './useSocket'
-
-export const PhoenixContext = React.createContext({
-  socket: undefined,
-  socketStatus: null
-})
 
 type ProviderProps = {
   url: string,
@@ -27,7 +23,7 @@ export const PhoenixSocketProvider = (props: ProviderProps) => {
   const phoenixSocket = useSocket(props.url, props.opts)
 
   return (
-    <PhoenixContext.Provider value={{...phoenixSocket}}>
+    <PhoenixContext.Provider value={{socket: phoenixSocket.socket}}>
       {props.children}
     </PhoenixContext.Provider>
   )

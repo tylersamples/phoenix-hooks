@@ -1,12 +1,12 @@
-import {useContext, useState, useRef, useCallback, useEffect, useImperativeHandle} from 'react'
-import { PhoenixContext } from './PhoenixSocketProvider'
+import { useContext, useState, useRef, useCallback, useEffect } from 'react'
 import { Socket, SocketConnectOption } from 'phoenix'
-import { SocketStates } from './index'
+
+import { SocketStates, PhoenixContext } from './types'
 
 type SocketOpts = SocketConnectOption & {
   onOpen: () => void;
   onClose: () => void;
-  onError: (any) => void;
+  onError: (arg0: any) => void;
 }
 
 /**
@@ -23,7 +23,7 @@ export function useSocket(url?: string, opts?: Partial<SocketOpts>) {
   }
 }
 
-export function usePhoenixSocket(url?: string, opts?: Partial<SocketOpts>) {
+export function usePhoenixSocket(url: string, opts?: Partial<SocketOpts>) {
   const {onOpen, onClose, onError} = opts || {}
 
   const [socketState, setSocketState] = useState(SocketStates.UNINSTANTIATED)

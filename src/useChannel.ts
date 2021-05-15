@@ -1,13 +1,15 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { useSocket, ChannelStates } from './index'
 
 import { Socket } from 'phoenix'
+
+import { useSocket  } from './useSocket'
+import { ChannelStates } from './types'
 
 type ChannelOptions = {
   onClose?: () => void;
   onError?: (err: any) => void;
   onLeave?: () => void;
-  onJoin?: (object) => void;
+  onJoin?: (arg0: object) => void;
   onTimeout?: () => void;
   socket: Socket;
   params: object;
@@ -33,21 +35,23 @@ export function useChannel(channelName: string, params: Partial<ChannelOptions> 
 
   const { onJoin, onError, onTimeout, onLeave, onClose } = opts
 
+
+
   const [channelState, setChannelState] = useState(ChannelStates.CLOSED)
 
   const onCloseCallback = useCallback(() => {
-    if (typeof onTimeout === 'function')
+    if (typeof onClose === 'function')
       onClose()
 
     setChannelState(ChannelStates.CLOSED)
-  })
+  }, [])
 
   const onErrorCallback = useCallback(err => {
     if (typeof onError === 'function')
       onError(err)
 
     setChannelState(ChannelStates.ERRORED)
-  })
+  }, [])
 
   const channelRef = useRef(socket.channel(channelName, opts))
 
@@ -79,17 +83,24 @@ export function useChannel(channelName: string, params: Partial<ChannelOptions> 
     )
 
   const pushEventCallback =
-    useCallback((event, payload, timeout) =>
-      channelRef.current.push(event, payload, timeout ? timeout : channelRef.current.timeout),
+    useCallback((event, payload, timeout?) => {
+        // @ts-ignore
+        const pushTimeout: number = timeout ? timeout : socket['timeout']
+
+        return channelRef.current.push(event, payload, pushTimeout)
+      },
       [],
     )
 
   const leaveCallback =
-    useCallback(timeout => {
+    useCallback((timeout?) => {
       setChannelState(ChannelStates.LEAVING)
 
-      channelRef.current
-        .leave(timeout ? channelRef.current : channelRef.current.timeout)
+        // @ts-ignore
+        const leaveTimeout: number = timeout ? timeout : socket['timeout']
+
+        channelRef.current
+        .leave(leaveTimeout)
         .receive('ok', () => {
           if (typeof onLeave === 'function')
             onLeave()
