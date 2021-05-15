@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react'
-import { useSocket, ChannelStates } from './index'
+import {useState, useCallback, useRef, useEffect} from 'react'
+import {useSocket, ChannelStates} from './index'
 
-import { Channel } from 'phoenix'
+import { Socket } from 'phoenix'
 
 type ChannelOptions = {
   onClose?: () => void;
@@ -9,6 +9,7 @@ type ChannelOptions = {
   onLeave?: () => void;
   onJoin?: (object) => void;
   onTimeout?: () => void;
+  socket: Socket
 }
 
 /**
@@ -17,8 +18,12 @@ type ChannelOptions = {
  * @param params
  */
 export function useChannel(channelName: string, params: Partial<ChannelOptions> = {}) {
-  const phoenixSocket = useSocket()
-  const { socket } = phoenixSocket
+  const { socket } = params
+
+  const phoenixSocket = socket || useSocket()
+
+  if (phoenixSocket.socket === undefined)
+    throw new Error('Socket is undefined. Is component within a provider or has a socket been passed?')
 
   const { onJoin, onError, onTimeout, onLeave, onClose } = params
 
@@ -38,66 +43,47 @@ export function useChannel(channelName: string, params: Partial<ChannelOptions> 
     setChannelState(ChannelStates.ERRORED)
   })
 
-  const [channel] =
-    useState(() => {
-      const channel: Channel =
-        socket.channel(channelName, params, phoenixSocket.socket)
+  const channelRef = useRef(phoenixSocket.socket.channel(channelName, params, phoenixSocket.socket))
 
-      setChannelState(ChannelStates.JOINING)
+  useEffect(() => {
+    setChannelState(ChannelStates.JOINING)
 
-      channel.join()
-        .receive('ok', args => {
-          if (typeof onJoin === 'function')
-            onJoin(args)
+    channelRef.current.join()
+      .receive('ok', args => {
+        if (typeof onJoin === 'function')
+          onJoin(args)
 
-          setChannelState(ChannelStates.JOINED)
-        })
-        .receive('timeout', () => {
-          if (typeof onTimeout === 'function')
-            onTimeout()
+        setChannelState(ChannelStates.JOINED)
+      })
+      .receive('timeout', () => {
+        if (typeof onTimeout === 'function')
+          onTimeout()
 
-          setChannelState(ChannelStates.ERRORED)
-        })
+        setChannelState(ChannelStates.ERRORED)
+      })
 
-      channel.onClose(onCloseCallback)
-      channel.onError(onErrorCallback)
-
-      return channel
-    })
-
-  const joinCallback =
-    useCallback(() => {
-        setChannelState(ChannelStates.JOINING)
-
-        channel.rejoin()
-        const joinRef = channel.joinRef()
-
-          joinRef
-          .receive('ok', args => {
-            setChannelState(ChannelStates.JOINED)
-          })
-      },
-      [channel]
-    )
+    channelRef.current.onClose(onCloseCallback)
+    channelRef.current.onError(onErrorCallback)
+    }, [channelRef])
 
   const handleEventCallback =
     useCallback((event, callback) =>
-      channel.on(event, callback),
-      [channel, channel.on]
+      channelRef.current.on(event, callback),
+      [],
     )
 
   const pushEventCallback =
     useCallback((event, payload, timeout) =>
-      channel.push(event, payload, timeout ? timeout : channel.timeout),
-      [channel, channel.push]
+      channelRef.current.push(event, payload, timeout ? timeout : channelRef.current.timeout),
+      [],
     )
 
   const leaveCallback =
     useCallback(timeout => {
       setChannelState(ChannelStates.LEAVING)
 
-      return channel
-        .leave(timeout ? channel : channel.timeout)
+      channelRef.current
+        .leave(timeout ? channelRef.current : channelRef.current.timeout)
         .receive('ok', () => {
           if (typeof onLeave === 'function')
             onLeave()
@@ -111,16 +97,15 @@ export function useChannel(channelName: string, params: Partial<ChannelOptions> 
           onCloseCallback()
         })
       },
-      [channel, channel.on]
+      [],
     )
 
   return {
     ...phoenixSocket,
-    channel,
+    channel: channelRef.current,
     channelState,
     handleChannelEvent: handleEventCallback,
     pushChannelEvent: pushEventCallback,
     leaveChannel: leaveCallback,
-    rejoinChannel: joinCallback
   }
 }

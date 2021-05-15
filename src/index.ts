@@ -1,5 +1,3 @@
-import {usePhoenixSocket} from './useSocket'
-
 export enum SocketStates {
   UNINSTANTIATED,
   CONNECTING ,
@@ -18,6 +16,6 @@ export enum ChannelStates {
 
 export { PhoenixSocketProvider } from './PhoenixSocketProvider'
 
-export { useSocket, usePhoenixSocket } from './useSocket'
+export { useSocket } from './useSocket'
 export { useChannel } from './useChannel'
 export { usePresence } from './usePresence'

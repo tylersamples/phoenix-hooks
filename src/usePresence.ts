@@ -1,4 +1,4 @@
-import {useState, useCallback, useEffect} from 'react'
+import {useState, useCallback, useEffect, useMemo} from 'react'
 import { Channel, Presence } from 'phoenix'
 
 import { useChannel } from './index'
@@ -12,36 +12,36 @@ export function usePresence(channelOrChannelName: Channel | string, opts?: any) 
   let channel = null
 
   if (typeof channelOrChannelName == 'string') {
-    let {channel} = useChannel(channelOrChannelName)
+    let {channel, setChannel} = useChannel(channelOrChannelName)
   } else {
     channel = channelOrChannelName as Channel
   }
 
   const [sync, setSync] = useState([])
 
-  const [presence] = useState(new Presence(channel))
+  const presence = useMemo(() => new Presence(channel), [channel]);
 
   useEffect(() => {
     presence.onSync(() => {
-      setSync(Presence.list(presence))
+      setSync(presence.list())
     })
   }, [presence])
 
   const listCallback =
     useCallback((cb, by = undefined) =>
-      presence.list(cb, by),
+        presence.list(cb, by),
       [channel, presence]
     )
 
   const onJoinCallback =
     useCallback(cb =>
-      presence.onJoin(cb),
+        presence.onJoin(cb),
       [channel, presence]
     )
 
   const onLeaveCallback =
     useCallback(cb =>
-      presence.onLeave(cb),
+        presence.onLeave(cb),
       [channel, presence]
     )
 
@@ -61,6 +61,7 @@ export function usePresence(channelOrChannelName: Channel | string, opts?: any) 
 
   return {
     ...channel,
+    presence: presence,
     listPresence: listCallback,
     handlePresenceJoin: onJoinCallback,
     handlePresenceLeave: onLeaveCallback,

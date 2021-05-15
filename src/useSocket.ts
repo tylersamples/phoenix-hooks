@@ -1,4 +1,4 @@
-import { useContext, useState, useCallback } from 'react'
+import {useContext, useState, useRef, useCallback, useEffect, useImperativeHandle} from 'react'
 import { PhoenixContext } from './PhoenixSocketProvider'
 import { Socket, SocketConnectOption } from 'phoenix'
 import { SocketStates } from './index'
@@ -43,34 +43,33 @@ export function usePhoenixSocket(url?: string, opts?: Partial<SocketOpts>) {
         onError(err)
     }, [onError])
 
-  let [socket] = useState(() => {
-    const socket = new Socket(url, opts)
+  const socketRef = useRef(new Socket(url, opts))
 
-    socket.onOpen(() => {
+  useEffect(() => {
+    socketRef.current.onOpen(() => {
       onOpenCallback()
 
       setSocketState(SocketStates.OPEN)
     })
 
-    socket.onClose(() => {
+    socketRef.current.onClose(() => {
       onCloseCallback()
 
       setSocketState(SocketStates.CLOSED)
     })
 
-    socket.onError(err => {
+    socketRef.current.onError(err => {
       onErrorCallback(err)
 
       setSocketState(SocketStates.CLOSING)
     })
     setSocketState(SocketStates.CONNECTING)
 
-    socket.connect()
-    return socket
+    socketRef.current.connect()
   })
 
   return {
-    socket,
+    socket: socketRef.current,
     socketState
   }
 }
