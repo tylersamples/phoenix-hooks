@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from 'react'
-import { Channel, Presence } from 'phoenix'
+import Phoenix from 'phoenix'
 
 /**
  * Use Phoenix Presence for a given channel.
@@ -7,10 +7,10 @@ import { Channel, Presence } from 'phoenix'
  * @param channel
  * @param opts
  */
-export function usePresence(channel: Channel, opts?: any) {
+export function usePresence(channel: Phoenix.Channel, opts?: any) {
   const [sync, setSync] = useState([])
 
-  const presence = useMemo(() => new Presence(channel), [channel]);
+  const presence = useMemo(() => new Phoenix.Presence(channel), [channel]);
 
   useEffect(() => {
     presence.onSync(() => {

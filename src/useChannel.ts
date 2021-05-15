@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 
-import { Socket } from 'phoenix'
+import Phoenix from 'phoenix'
 
 import { useSocket  } from './useSocket'
 import { ChannelStates } from './types'
@@ -11,7 +11,7 @@ type ChannelOptions = {
   onLeave?: () => void;
   onJoin?: (arg0: object) => void;
   onTimeout?: () => void;
-  socket: Socket;
+  socket: Phoenix.Socket;
   params: object;
 }
 

@@ -1,5 +1,5 @@
 import { useContext, useState, useRef, useCallback, useEffect } from 'react'
-import { Socket, SocketConnectOption } from 'phoenix'
+import Phoenix, { SocketConnectOption } from 'phoenix'
 
 import { SocketStates, PhoenixContext } from './types'
 
@@ -46,7 +46,7 @@ export function usePhoenixSocket(url: string, opts?: Partial<SocketOpts>) {
         onError(err)
     }, [onError])
 
-  const socketRef = useRef(new Socket(url, opts))
+  const socketRef = useRef(new Phoenix.Socket(url, opts))
 
   useEffect(() => {
     socketRef.current.onOpen(() => {

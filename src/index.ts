@@ -1,4 +1,4 @@
-export {SocketStates, ChannelStates} from './types'
+export { SocketStates, ChannelStates } from './types'
 
 export { PhoenixSocketProvider } from './PhoenixSocketProvider'
 

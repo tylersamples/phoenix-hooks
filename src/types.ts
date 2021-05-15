@@ -1,5 +1,5 @@
 import React from 'react'
-import { Socket } from 'phoenix'
+import Phoenix from 'phoenix'
 
 export enum SocketStates {
   UNINSTANTIATED = -1,
@@ -18,7 +18,7 @@ export enum ChannelStates {
 }
 
 type CreatePhoenixContext = {
-  socket: Socket | undefined
+  socket: Phoenix.Socket | undefined
 }
 
 export const PhoenixContext =
