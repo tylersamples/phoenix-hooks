@@ -1,5 +1,5 @@
-import {useState, useCallback, useRef, useEffect} from 'react'
-import {useSocket, ChannelStates} from './index'
+import { useState, useCallback, useRef, useEffect } from 'react'
+import { useSocket, ChannelStates } from './index'
 
 import { Socket } from 'phoenix'
 
@@ -14,6 +14,7 @@ type ChannelOptions = {
 }
 
 /**
+ * Join a Phoenix Channel
  *
  * @param channelName
  * @param params
@@ -106,8 +107,8 @@ export function useChannel(channelName: string, params: Partial<ChannelOptions> 
     )
 
   return {
-    channel: channelRef.current,
     channelState,
+    channel: channelRef.current,
     handleChannelEvent: handleEventCallback,
     pushChannelEvent: pushEventCallback,
     leaveChannel: leaveCallback,

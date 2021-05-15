@@ -1,9 +1,9 @@
 export enum SocketStates {
   UNINSTANTIATED = -1,
-  CONNECTING ,
+  CONNECTING,
   OPEN,
-  CLOSING ,
-  CLOSED ,
+  CLOSING,
+  CLOSED,
 }
 
 export enum ChannelStates {
