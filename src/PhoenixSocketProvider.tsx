@@ -16,14 +16,14 @@ type ProviderProps = {
  * @param props
  * @constructor
  */
-export const PhoenixSocketProvider = (props: ProviderProps) => {
+export const PhoenixSocketProvider : React.FC<ProviderProps> = (props: ProviderProps) => {
   if (!props.url)
     throw new Error('No url provided')
 
   const phoenixSocket = useSocket(props.url, props.opts)
 
   return (
-    <PhoenixContext.Provider value={{socket: phoenixSocket.socket}}>
+    <PhoenixContext.Provider value={{...phoenixSocket}}>
       {props.children}
     </PhoenixContext.Provider>
   )
