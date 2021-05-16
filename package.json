@@ -1,7 +1,7 @@
 {
   "name": "phoenix-hooks",
   "version": "1.0.1",
-  "description": "",
+  "description": "Phoenix Sockets, Channels, and Presence with React hooks.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
