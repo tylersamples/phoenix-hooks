@@ -1,7 +1,7 @@
 import { useContext, useState, useRef, useCallback, useEffect } from 'react'
 import Phoenix, { SocketConnectOption } from 'phoenix'
 
-import { SocketStates, PhoenixContext } from './types'
+import { SocketStates, PhoenixContext, SocketHook } from './types'
 
 type SocketOpts = SocketConnectOption & {
   onOpen: () => void;
@@ -15,7 +15,7 @@ type SocketOpts = SocketConnectOption & {
  * @param url
  * @param opts
  */
-export function useSocket(url?: string, opts?: Partial<SocketOpts>) {
+export function useSocket(url?: string, opts?: Partial<SocketOpts>) : SocketHook {
   if (typeof url !== 'undefined') {
     return usePhoenixSocket(url, opts)
   } else {

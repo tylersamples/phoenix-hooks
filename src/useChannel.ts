@@ -2,8 +2,8 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 
 import Phoenix from 'phoenix'
 
-import { useSocket  } from './useSocket'
-import { ChannelStates } from './types'
+import { useSocket } from './useSocket'
+import { ChannelHook, ChannelStates } from './types'
 
 type ChannelOptions = {
   onClose?: () => void;
@@ -21,7 +21,7 @@ type ChannelOptions = {
  * @param channelName
  * @param params
  */
-export function useChannel(channelName: string, params: Partial<ChannelOptions> = {}) {
+export function useChannel(channelName: string, params: Partial<ChannelOptions> = {}) : ChannelHook {
   let { socket, ...opts } = params
 
   if (socket === undefined) {
@@ -34,8 +34,6 @@ export function useChannel(channelName: string, params: Partial<ChannelOptions> 
     throw new Error('Socket is undefined. Is component within a provider or has a socket been passed?')
 
   const { onJoin, onError, onTimeout, onLeave, onClose } = opts
-
-
 
   const [channelState, setChannelState] = useState(ChannelStates.CLOSED)
 
