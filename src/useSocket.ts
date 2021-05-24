@@ -12,21 +12,42 @@ type SocketOpts = SocketConnectOption & {
 /**
  * Instantiate and connect using Phoenix sockets or use PhoenixSocketProviders socket.
  *
- * @param url
+ * @param urlOrSocket
  * @param opts
  */
-export function useSocket(url?: string, opts?: Partial<SocketOpts>) : SocketHook {
-  if (typeof url !== 'undefined') {
-    return usePhoenixSocket(url, opts)
+export function useSocket(urlOrSocket?: string | Phoenix.Socket, opts?: Partial<SocketOpts>) : SocketHook {
+  if (typeof urlOrSocket !== 'undefined') {
+    return usePhoenixSocket(urlOrSocket, opts)
   } else {
     return useContext(PhoenixContext)
   }
 }
 
-export function usePhoenixSocket(url: string, opts?: Partial<SocketOpts>) {
+export function usePhoenixSocket(urlOrSocket: string | Phoenix.Socket, opts?: Partial<SocketOpts>) {
   const {onOpen, onClose, onError} = opts || {}
 
   const [socketState, setSocketState] = useState(SocketStates.UNINSTANTIATED)
+
+  const socketRef = useRef<Phoenix.Socket>(typeof urlOrSocket == 'string' ? new Phoenix.Socket(urlOrSocket, opts) : urlOrSocket)
+
+  useEffect(() => {
+    // In the event our socket was not a new one. Use the connection state from the socketRef.
+    switch (socketRef.current.connectionState())
+    {
+      case 'open':
+        setSocketState(SocketStates.OPEN)
+        break
+      case 'closed' :
+        setSocketState(SocketStates.CLOSED)
+        break
+      case 'closing':
+        setSocketState(SocketStates.CLOSING)
+        break
+      case 'connecting':
+        setSocketState(SocketStates.CONNECTING)
+        break
+    }
+  }, [])
 
   const onOpenCallback =
     useCallback(() => {
@@ -45,8 +66,6 @@ export function usePhoenixSocket(url: string, opts?: Partial<SocketOpts>) {
       if (typeof onError === 'function')
         onError(err)
     }, [onError])
-
-  const socketRef = useRef(new Phoenix.Socket(url, opts))
 
   useEffect(() => {
     socketRef.current.onOpen(() => {

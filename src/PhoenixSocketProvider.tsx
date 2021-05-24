@@ -1,14 +1,13 @@
 import React from 'react'
-import { SocketConnectOption } from 'phoenix'
+import Phoenix, { SocketConnectOption } from 'phoenix'
 
 import { PhoenixContext } from './types'
 import { useSocket } from './useSocket'
 
 type ProviderProps = {
-  url: string,
   children: React.ReactNode
   opts?: Partial<SocketConnectOption>
-}
+} & ({ url: string} | { socket: Phoenix.Socket})
 
 /**
  * Phoenix Socket context provider.
@@ -17,10 +16,12 @@ type ProviderProps = {
  * @constructor
  */
 export const PhoenixSocketProvider : React.FC<ProviderProps> = (props: ProviderProps) => {
-  if (!props.url)
-    throw new Error('No url provided')
+  const urlOrSocket = 'url' in props ? props.url : props.socket
 
-  const phoenixSocket = useSocket(props.url, props.opts)
+  if (!urlOrSocket)
+    throw new Error('No url or socket provided')
+
+  const phoenixSocket = useSocket(urlOrSocket, props.opts)
 
   return (
     <PhoenixContext.Provider value={{...phoenixSocket}}>
